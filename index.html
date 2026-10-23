@@ -3,695 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Offline Text Manager</title>
+<title>Offline Text Sharing</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
-
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
-    background: #f1f5f9;
-    color: #1e293b;
-}
-
-header {
-    background: #172554;
-    color: white;
+    max-width: 700px;
+    margin: 40px auto;
     padding: 20px;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 24px;
-}
-
-header p {
-    margin-bottom: 0;
-    color: #cbd5e1;
+    background: #f1f5f9;
 }
 
 .container {
-    max-width: 1100px;
-    margin: 25px auto;
-    padding: 15px;
-}
-
-.toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-button, .file-button {
-    border: none;
-    padding: 11px 15px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.primary {
-    background: #2563eb;
-    color: white;
-}
-
-.secondary {
-    background: #e2e8f0;
-    color: #1e293b;
-}
-
-.danger {
-    background: #dc2626;
-    color: white;
-}
-
-button:hover, .file-button:hover {
-    opacity: 0.85;
-}
-
-.search {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    font-size: 15px;
-}
-
-.layout {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 20px;
-}
-
-.panel {
     background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px #0000000d;
-    min-width: 0;
+    padding: 25px;
+    border-radius: 12px;
 }
 
-.file-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+h1 {
+    color: #1d4ed8;
 }
 
-.file-item {
-    padding: 12px;
-    border-radius: 6px;
-    background: #f8fafc;
-    cursor: pointer;
-    overflow-wrap: anywhere;
-    border: 1px solid #e2e8f0;
-}
-
-.file-item.active {
-    background: #dbeafe;
-    border-color: #2563eb;
-}
-
-.file-item small {
-    display: block;
-    margin-top: 5px;
-    color: #64748b;
-}
-
-input[type="text"], textarea {
+input, textarea, button {
     width: 100%;
+    box-sizing: border-box;
     padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    margin-bottom: 15px;
-    font-size: 15px;
+    margin: 8px 0;
+    font-size: 16px;
 }
 
 textarea {
-    min-height: 350px;
-    resize: vertical;
-    font-family: Consolas, monospace;
-    line-height: 1.6;
+    height: 180px;
 }
 
-.editor-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
-.status {
-    margin-top: 15px;
-    color: #15803d;
+button:hover {
+    background: #1d4ed8;
+}
+
+.note {
+    color: #64748b;
     font-size: 14px;
-    overflow-wrap: anywhere;
-}
-
-.empty {
-    color: #64748b;
-    padding: 20px 0;
-}
-
-#fileInput {
-    display: none;
-}
-
-footer {
-    text-align: center;
-    color: #64748b;
-    padding: 25px;
-    font-size: 13px;
-}
-
-@media (max-width: 700px) {
-    .layout {
-        grid-template-columns: 1fr;
-    }
-
-    textarea {
-        min-height: 250px;
-    }
 }
 </style>
 </head>
 
 <body>
-
-<header>
-    <h1>Offline Text Manager</h1>
-    <p>Create, edit, save and transfer text files without internet.</p>
-</header>
-
 <div class="container">
+    <h1>Offline Text Sharing</h1>
 
-    <div class="toolbar">
-        <button class="primary" id="newBtn">+ New File</button>
+    <p class="note">
+        Save text as a file and transfer it using a USB drive.
+        Open the saved file on another computer by selecting it below.
+    </p>
 
-        <button class="secondary" id="exportBtn">
-            Export All Files
-        </button>
+    <h3>1. Save Text</h3>
 
-        <button class="secondary" id="importBtn">
-            Import Files
-        </button>
+    <input id="saveName" placeholder="Enter filename (e.g. project.txt)">
 
-        <input type="file" id="fileInput" accept=".json,.txt,.md">
-    </div>
+    <textarea id="saveText" placeholder="Enter your text here..."></textarea>
 
-    <input
-        type="text"
-        class="search"
-        id="searchInput"
-        placeholder="Search your files..."
-    >
+    <button onclick="saveTextFile()">Download Text File</button>
 
-    <div class="layout">
+    <hr>
 
-        <div class="panel">
-            <h3>My Files</h3>
-            <div id="fileList" class="file-list"></div>
-        </div>
+    <h3>2. Retrieve Text</h3>
 
-        <div class="panel">
+    <p>Select a text file copied from the other computer.</p>
 
-            <h3>File Editor</h3>
+    <input type="file" id="openFile" accept=".txt,.md,.csv">
 
-            <label for="fileName">File name</label>
-            <input
-                type="text"
-                id="fileName"
-                placeholder="example.txt"
-                maxlength="200"
-            >
+    <div id="result"></div>
 
-            <label for="fileContent">File content</label>
-            <textarea
-                id="fileContent"
-                placeholder="Type your text here..."
-            ></textarea>
-
-            <div class="editor-actions">
-                <button class="primary" id="saveBtn">
-                    Save File
-                </button>
-
-                <button class="secondary" id="downloadBtn">
-                    Download TXT
-                </button>
-
-                <button class="danger" id="deleteBtn">
-                    Delete File
-                </button>
-            </div>
-
-            <div id="status" class="status" role="status"></div>
-
-        </div>
-    </div>
+    <textarea id="displayText" placeholder="Retrieved text will appear here..." readonly></textarea>
 </div>
 
-<footer>
-    Offline Text Manager · Your files stay on this device
-</footer>
-
 <script>
-"use strict";
-
-const STORAGE_KEY = "offline_text_manager_v1";
-
-const fileList = document.getElementById("fileList");
-const fileName = document.getElementById("fileName");
-const fileContent = document.getElementById("fileContent");
-const searchInput = document.getElementById("searchInput");
-const status = document.getElementById("status");
-const fileInput = document.getElementById("fileInput");
-
-let files = [];
-let selectedId = null;
-let dirty = false;
-
-function makeId() {
-    if (crypto.randomUUID) {
-        return crypto.randomUUID();
-    }
-
-    return Date.now().toString(36) +
-        Math.random().toString(36).slice(2);
-}
-
-function setStatus(message, error = false) {
-    status.textContent = message;
-    status.style.color = error ? "#dc2626" : "#15803d";
-}
-
-function loadFiles() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const parsed = raw ? JSON.parse(raw) : [];
-
-        if (!Array.isArray(parsed)) {
-            throw new Error("Invalid stored data");
-        }
-
-        files = parsed.filter(file =>
-            file &&
-            typeof file.id === "string" &&
-            typeof file.name === "string" &&
-            typeof file.content === "string"
-        );
-    } catch (error) {
-        files = [];
-        setStatus(
-            "Could not load saved data. Exported backups may help recover files.",
-            true
-        );
-    }
-}
-
-function persistFiles() {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(files));
-        return true;
-    } catch (error) {
-        setStatus(
-            "Storage failed or is full. Export your data and free some space.",
-            true
-        );
-        return false;
-    }
-}
-
-function renderFiles() {
-    fileList.replaceChildren();
-
-    const query = searchInput.value.trim().toLowerCase();
-
-    const filtered = files.filter(file =>
-        file.name.toLowerCase().includes(query) ||
-        file.content.toLowerCase().includes(query)
-    );
-
-    if (filtered.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = files.length
-            ? "No matching files."
-            : "No files yet. Create your first file.";
-        fileList.appendChild(empty);
-        return;
-    }
-
-    filtered.forEach(file => {
-        const item = document.createElement("div");
-        item.className = "file-item" +
-            (file.id === selectedId ? " active" : "");
-
-        const title = document.createElement("strong");
-        title.textContent = file.name;
-
-        const info = document.createElement("small");
-        info.textContent =
-            new Date(file.updatedAt || Date.now()).toLocaleString();
-
-        item.append(title, info);
-
-        item.addEventListener("click", () => {
-            if (!confirmDiscard()) return;
-            selectFile(file.id);
-        });
-
-        fileList.appendChild(item);
-    });
-}
-
-function selectFile(id) {
-    const file = files.find(item => item.id === id);
-
-    if (!file) return;
-
-    selectedId = id;
-    fileName.value = file.name;
-    fileContent.value = file.content;
-    dirty = false;
-
-    setStatus("Opened: " + file.name);
-    renderFiles();
-}
-
-function confirmDiscard() {
-    if (!dirty) return true;
-
-    return confirm(
-        "You have unsaved changes. Discard them and continue?"
-    );
-}
-
-function newFile() {
-    if (!confirmDiscard()) return;
-
-    selectedId = null;
-    fileName.value = "untitled.txt";
-    fileContent.value = "";
-    dirty = false;
-
-    setStatus("New file. Click Save File to store it.");
-    renderFiles();
-    fileName.focus();
-}
-
-function saveFile() {
-    const name = fileName.value.trim();
-    const content = fileContent.value;
+function saveTextFile() {
+    const name = document.getElementById("saveName").value.trim();
+    const text = document.getElementById("saveText").value;
 
     if (!name) {
-        setStatus("Please enter a file name.", true);
-        fileName.focus();
+        alert("Please enter a filename.");
         return;
     }
 
     if (/[\\/]/.test(name) || name === "." || name === "..") {
-        setStatus("File name cannot contain path separators.", true);
+        alert("Please enter a valid filename.");
         return;
     }
 
-    const duplicate = files.find(file =>
-        file.name.toLowerCase() === name.toLowerCase() &&
-        file.id !== selectedId
-    );
+    const filename = name.endsWith(".txt") ? name : name + ".txt";
 
-    if (duplicate) {
-        setStatus("Another file already uses this name.", true);
-        return;
-    }
+    const blob = new Blob([text], {
+        type: "text/plain;charset=utf-8"
+    });
 
-    if (selectedId) {
-        const file = files.find(item => item.id === selectedId);
-
-        if (!file) {
-            setStatus("File not found. Create a new file instead.", true);
-            return;
-        }
-
-        file.name = name;
-        file.content = content;
-        file.updatedAt = new Date().toISOString();
-    } else {
-        const file = {
-            id: makeId(),
-            name: name,
-            content: content,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-
-        files.unshift(file);
-        selectedId = file.id;
-    }
-
-    if (!persistFiles()) return;
-
-    dirty = false;
-    renderFiles();
-    setStatus("Saved successfully on this device.");
-}
-
-function deleteFile() {
-    if (!selectedId) {
-        setStatus("Select a saved file first.", true);
-        return;
-    }
-
-    const file = files.find(item => item.id === selectedId);
-
-    if (!file) return;
-
-    if (!confirm('Permanently delete "' + file.name + '"?')) return;
-
-    const oldFiles = files;
-    files = files.filter(item => item.id !== selectedId);
-
-    if (!persistFiles()) {
-        files = oldFiles;
-        return;
-    }
-
-    selectedId = null;
-    fileName.value = "";
-    fileContent.value = "";
-    dirty = false;
-
-    renderFiles();
-    setStatus("File deleted.");
-}
-
-function downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
     link.href = url;
     link.download = filename;
-    document.body.appendChild(link);
     link.click();
-    link.remove();
 
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function downloadText() {
-    const name = fileName.value.trim();
-
-    if (!name) {
-        setStatus("Enter a file name first.", true);
-        return;
-    }
-
-    const safeName = name.replace(/[\\/]/g, "_");
-
-    const blob = new Blob(
-        [fileContent.value],
-        { type: "text/plain;charset=utf-8" }
-    );
-
-    downloadBlob(blob, safeName.endsWith(".txt")
-        ? safeName
-        : safeName + ".txt");
-
-    setStatus("Text file downloaded.");
-}
-
-function exportAll() {
-    const backup = {
-        format: "OfflineTextManager",
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        files: files
-    };
-
-    const blob = new Blob(
-        [JSON.stringify(backup, null, 2)],
-        { type: "application/json;charset=utf-8" }
-    );
-
-    downloadBlob(
-        blob,
-        "offline-text-backup-" +
-        new Date().toISOString().slice(0, 10) +
-        ".json"
-    );
-
-    setStatus("Backup exported. Transfer it to the other computer.");
-}
-
-function importData() {
-    fileInput.value = "";
-    fileInput.click();
-}
-
-function validateImportedFiles(data) {
-    if (!data || !Array.isArray(data.files)) {
-        throw new Error("Invalid backup format.");
-    }
-
-    if (data.files.length > 10000) {
-        throw new Error("Too many files in backup.");
-    }
-
-    const seen = new Set();
-
-    return data.files.map(file => {
-        if (
-            !file ||
-            typeof file.name !== "string" ||
-            typeof file.content !== "string"
-        ) {
-            throw new Error("Backup contains an invalid file.");
-        }
-
-        if (
-            file.name.length > 200 ||
-            /[\\/]/.test(file.name) ||
-            file.name === "." ||
-            file.name === ".."
-        ) {
-            throw new Error("Backup contains an invalid file name.");
-        }
-
-        const key = file.name.toLowerCase();
-
-        if (seen.has(key)) {
-            throw new Error("Backup contains duplicate file names.");
-        }
-
-        seen.add(key);
-
-        return {
-            id: makeId(),
-            name: file.name,
-            content: file.content,
-            createdAt: file.createdAt || new Date().toISOString(),
-            updatedAt: file.updatedAt || new Date().toISOString()
-        };
-    });
-}
-
-async function handleImport(event) {
-    const file = event.target.files[0];
+document.getElementById("openFile").addEventListener("change", async function() {
+    const file = this.files[0];
 
     if (!file) return;
 
-    if (file.size > 50 * 1024 * 1024) {
-        setStatus("Backup is too large. Maximum size is 50 MB.", true);
-        return;
-    }
+    const text = await file.text();
 
-    try {
-        const text = await file.text();
-        let imported;
-
-        if (file.name.toLowerCase().endsWith(".txt") ||
-            file.name.toLowerCase().endsWith(".md")) {
-
-            imported = [{
-                id: makeId(),
-                name: file.name,
-                content: text,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            }];
-
-        } else {
-            const data = JSON.parse(text);
-            imported = validateImportedFiles(data);
-        }
-
-        if (!confirmDiscard()) return;
-
-        const merged = [...files];
-        const existingNames = new Set(
-            merged.map(item => item.name.toLowerCase())
-        );
-
-        let added = 0;
-        let skipped = 0;
-
-        for (const file of imported) {
-            if (existingNames.has(file.name.toLowerCase())) {
-                skipped++;
-                continue;
-            }
-
-            merged.push(file);
-            existingNames.add(file.name.toLowerCase());
-            added++;
-        }
-
-        const previous = files;
-        files = merged;
-
-        if (!persistFiles()) {
-            files = previous;
-            return;
-        }
-
-        selectedId = null;
-        fileName.value = "";
-        fileContent.value = "";
-        dirty = false;
-
-        renderFiles();
-
-        setStatus(
-            "Import complete: " + added +
-            " added, " + skipped + " duplicate names skipped."
-        );
-
-    } catch (error) {
-        setStatus("Import failed: " + error.message, true);
-    } finally {
-        fileInput.value = "";
-    }
-}
-
-document.getElementById("newBtn").addEventListener("click", newFile);
-document.getElementById("saveBtn").addEventListener("click", saveFile);
-document.getElementById("deleteBtn").addEventListener("click", deleteFile);
-document.getElementById("downloadBtn").addEventListener("click", downloadText);
-document.getElementById("exportBtn").addEventListener("click", exportAll);
-document.getElementById("importBtn").addEventListener("click", importData);
-
-searchInput.addEventListener("input", renderFiles);
-fileInput.addEventListener("change", handleImport);
-
-fileName.addEventListener("input", () => dirty = true);
-fileContent.addEventListener("input", () => dirty = true);
-
-loadFiles();
-renderFiles();
+    document.getElementById("displayText").value = text;
+    document.getElementById("result").textContent =
+        "Loaded file: " + file.name;
+});
 </script>
-
 </body>
 </html>
